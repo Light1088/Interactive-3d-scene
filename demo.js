@@ -3,6 +3,60 @@
  * No private school tests, grading scripts, team source or video assets included.
  */
 "use strict";
+
+function startInteractionPreview() {
+  const oldCanvas = document.getElementById("renderCanvas");
+  const canvas = oldCanvas.cloneNode(true);
+  oldCanvas.replaceWith(canvas);
+  const ctx = canvas.getContext("2d");
+  const distance = document.getElementById("distance");
+  const status = document.getElementById("status");
+  const reset = document.getElementById("reset");
+  const vr = document.getElementById("vr");
+  document.getElementById("failure").style.display = "none";
+  status.textContent = "2D interaction preview — 3D rendering is unavailable in this browser. Drag the blue ball, click it to enlarge it, or select Reset.";
+  vr.disabled = true; vr.textContent = "VR needs 3D support";
+  let ball = {x:-3,z:-1,scale:1}, down = null, width = 0, height = 0, unit = 1;
+  function point(x,z) { return {x:width/2+x*unit,y:height/2+z*unit}; }
+  function draw() {
+    const ratio = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    width = rect.width; height = rect.height; unit = Math.min(width,height)/18;
+    canvas.width = Math.round(width*ratio); canvas.height = Math.round(height*ratio);
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    ctx.fillStyle = "#142736"; ctx.fillRect(0,0,width,height);
+    ctx.strokeStyle = "#284658"; ctx.lineWidth = 1;
+    for(let n=-8;n<=8;n++){const a=point(n,-8),b=point(n,8),c=point(-8,n),d=point(8,n);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.moveTo(c.x,c.y);ctx.lineTo(d.x,d.y);ctx.stroke();}
+    const target=point(3,3),p=point(ball.x,ball.z);
+    ctx.setLineDash([6,5]);ctx.strokeStyle="#9cbac8";ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(target.x,target.y);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#efad53";ctx.fillRect(target.x-unit*.6,target.y-unit*.6,unit*1.2,unit*1.2);
+    ctx.fillStyle="#39b9ed";ctx.beginPath();ctx.arc(p.x,p.y,unit*.6*ball.scale,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#eef4fa";ctx.font="15px system-ui";ctx.fillText("Blue ball",p.x+unit*ball.scale,p.y);ctx.fillText("Reference",target.x+unit,target.y);
+    const d=Math.hypot(ball.x-3,ball.z-3,.6*ball.scale);
+    distance.textContent="Distance to reference origin: "+d.toFixed(2)+" scene units";
+  }
+  canvas.addEventListener("pointerdown", e=>{
+    const r=canvas.getBoundingClientRect(),p=point(ball.x,ball.z),x=e.clientX-r.left,y=e.clientY-r.top;
+    if(Math.hypot(x-p.x,y-p.y)<=Math.max(unit*.6*ball.scale,20)){
+      down={id:e.pointerId,x,y,bx:ball.x,bz:ball.z,moved:false};canvas.setPointerCapture(e.pointerId);e.preventDefault();
+    }
+  });
+  canvas.addEventListener("pointermove",e=>{
+    if(!down||e.pointerId!==down.id)return;
+    const r=canvas.getBoundingClientRect(),dx=e.clientX-r.left-down.x,dy=e.clientY-r.top-down.y;
+    if(Math.hypot(dx,dy)>4)down.moved=true;
+    if(down.moved){ball.x=Math.max(-7,Math.min(7,down.bx+dx/unit));ball.z=Math.max(-7,Math.min(7,down.bz+dy/unit));draw();}
+  });
+  canvas.addEventListener("pointerup",e=>{
+    if(!down||e.pointerId!==down.id)return;
+    if(!down.moved)ball.scale=Math.min(2.5,ball.scale*1.2);
+    down=null;draw();
+  });
+  canvas.addEventListener("pointercancel",()=>{down=null;});
+  reset.disabled=false;reset.onclick=()=>{ball={x:-3,z:-1,scale:1};draw();};
+  window.addEventListener("resize",draw);draw();
+}
+
 (async function () {
   const status = document.getElementById("status");
   const failure = document.getElementById("failure");
@@ -10,7 +64,7 @@
   const reset = document.getElementById("reset");
   const vr = document.getElementById("vr");
   function fail(message) { failure.style.display = "block"; failure.textContent = message; }
-  if (!window.BABYLON) { status.textContent = "Engine unavailable."; fail("The 3D engine could not load. Check your internet connection and reload."); return; }
+  if (!window.BABYLON || !BABYLON.Engine.IsSupported()) { startInteractionPreview(); return; }
   try {
     const B = window.BABYLON;
     const canvas = document.getElementById("renderCanvas");
@@ -80,5 +134,5 @@
         vr.textContent = "Use the headset button to enter VR";
       } catch (e) { vr.textContent = "VR could not initialise"; }
     };
-  } catch (e) { status.textContent = "Scene could not start."; fail("Your browser needs WebGL enabled to run this demo. " + e.message); }
+  } catch (e) { startInteractionPreview(); }
 })();
