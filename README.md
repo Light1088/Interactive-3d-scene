@@ -3,7 +3,7 @@
 
 A scene where users move a ball, click to enlarge it and see its distance from a reference model.
 
-**[Open the browser demo](https://light1088.github.io/Interactive-3d-scene/)** — drag the blue ball, click it to enlarge it, then try Reset. Browsers without WebGL use a labelled 2D interaction preview.
+**[Open the browser demo](https://light1088.github.io/Interactive-3d-scene/?v=3)** — drag the blue ball, click it to enlarge it, then try Reset. Browsers without WebGL use a labelled 2D interaction preview.
 
 ## Scene development
 The scene begins with **objects, lighting and camera controls**. An **imported dragon** provides a reference. **Click and drag interactions** change the ball, while a **distance label updates every frame**. The coursework also configures **360° video and VR teleportation**.
