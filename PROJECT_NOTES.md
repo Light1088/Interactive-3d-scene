@@ -20,7 +20,9 @@ The submitted code shows these implementations. Browser recordings, automated-te
 
 Code review identified a mismatch between a comment and the drag setting: the specified diagonal axis does not provide unrestricted movement across the floor. Video playback also depends on the video file and browser autoplay settings, while the model loads from an external URL.
 
-A public browser adaptation is now included as index.html and demo.js. It adds instructions, Reset, floor-plane dragging, model fallback and a VR support check. The original video is omitted. JavaScript syntax was checked; local browser testing was blocked by the execution environment. Runtime and headset verification remain pending. See PUBLISHING.md to activate GitHub Pages.
+The [public browser adaptation](https://light1088.github.io/Interactive-3d-scene/?v=3) is hosted on GitHub Pages. It adds instructions, Reset, floor-plane dragging, model fallback and a VR support check. The original video is omitted.
+
+**Browser checks completed:** the labelled 2D fallback loaded, clicking enlarged the ball, dragging changed the distance from 7.25 to 3.78 scene units, and Reset restored 7.24 scene units and the initial ball state. JavaScript syntax also passed checking. Full 3D rendering, dragon loading and headset interactions remain unverified because the test browser did not provide WebGL. These checks concern the public adaptation, not the original assignment tests.
 
 ## Credits
 - Coursework: IPA 1, CSD3121 — Developing Immersive Applications.
