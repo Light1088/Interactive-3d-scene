@@ -64,7 +64,7 @@ function startInteractionPreview() {
   const reset = document.getElementById("reset");
   const vr = document.getElementById("vr");
   function fail(message) { failure.style.display = "block"; failure.textContent = message; }
-  if (!window.BABYLON || !BABYLON.Engine.IsSupported()) { startInteractionPreview(); return; }
+  if (!window.BABYLON) { startInteractionPreview(); return; }
   try {
     const B = window.BABYLON;
     const canvas = document.getElementById("renderCanvas");
